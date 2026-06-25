@@ -44,7 +44,7 @@ app.get('/proxy', async (req, res) => {
   }
 });
 
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
