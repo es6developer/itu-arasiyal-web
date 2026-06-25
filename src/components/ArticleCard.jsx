@@ -1,12 +1,34 @@
-import { useState } from 'react';
-import { Heart, Bookmark, BookmarkCheck, Share2, Clock } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Heart, Bookmark, BookmarkCheck, Share2, Clock, Volume2, VolumeX } from 'lucide-react';
 import { formatDate, truncate } from '../utils/helpers';
 
 export default function ArticleCard({ article, isBookmarked, onBookmark, onOpen, size = 'default' }) {
   const [liked, setLiked] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const utteranceRef = useRef(null);
   const hasImage = !!article.imageUrl && !imgError;
+
+  const handleTTS = (e) => {
+    e.stopPropagation();
+    if (speaking) {
+      speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const text = article.description
+      ? `${article.title}. ${article.description}`
+      : article.title;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ta-IN';
+    utterance.rate = 0.9;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    utteranceRef.current = utterance;
+    speechSynthesis.speak(utterance);
+    setSpeaking(true);
+  };
 
   const handleShare = async (e) => {
     e.stopPropagation();
@@ -85,6 +107,17 @@ export default function ArticleCard({ article, isBookmarked, onBookmark, onOpen,
             }`}
           >
             <Heart size={15} fill={liked ? 'currentColor' : 'none'} />
+          </button>
+          <button
+            onClick={handleTTS}
+            className={`p-1.5 rounded-lg transition-colors ${
+              speaking
+                ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20'
+                : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700'
+            }`}
+            title={speaking ? 'Stop reading' : 'Read aloud'}
+          >
+            {speaking ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>
           <button
             onClick={handleShare}

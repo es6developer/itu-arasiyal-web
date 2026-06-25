@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Clock, Share2, Bookmark, BookmarkCheck, ExternalLink, Heart, ChevronRight, User, Tag } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { ArrowLeft, Clock, Share2, Bookmark, BookmarkCheck, ExternalLink, Heart, ChevronRight, User, Tag, Volume2, VolumeX } from 'lucide-react';
 import { formatDate } from '../utils/helpers';
 import ArticleCard from './ArticleCard';
 import { useBookmarks } from '../hooks/useBookmarks';
@@ -7,11 +7,32 @@ import { useBookmarks } from '../hooks/useBookmarks';
 export default function ArticlePage({ article, allArticles, onBack, onOpenArticle }) {
   const [liked, setLiked] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const { isBookmarked, toggleBookmark } = useBookmarks();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    speechSynthesis.cancel();
+    setSpeaking(false);
   }, [article.guid]);
+
+  const handleTTS = () => {
+    if (speaking) {
+      speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const text = article.description
+      ? `${article.title}. ${article.description}`
+      : article.title;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ta-IN';
+    utterance.rate = 0.9;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    speechSynthesis.speak(utterance);
+    setSpeaking(true);
+  };
 
   const recommended = useMemo(() => {
     return allArticles
@@ -49,6 +70,17 @@ export default function ArticlePage({ article, allArticles, onBack, onOpenArticl
             <span className="text-sm font-medium tamil hidden sm:inline">பின்செல்</span>
           </button>
           <div className="flex items-center gap-0.5">
+            <button
+              onClick={handleTTS}
+              className={`p-2 rounded-lg transition-colors ${
+                speaking
+                  ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20'
+                  : 'text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'
+              }`}
+              title={speaking ? 'Stop reading' : 'Read aloud'}
+            >
+              {speaking ? <VolumeX size={17} /> : <Volume2 size={17} />}
+            </button>
             <button
               onClick={() => setLiked(!liked)}
               className={`p-2 rounded-lg transition-colors ${
