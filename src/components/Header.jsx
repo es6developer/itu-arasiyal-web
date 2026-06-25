@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu, X, Bookmark, Search, Moon, Sun, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, X, Bookmark, Search, Moon, Sun, ChevronLeft, ChevronRight, WifiOff } from 'lucide-react';
 import { APP_NAME, CATEGORIES } from '../utils/constants';
 
 const PRIMARY_CATS = ['all', 'politics', 'tamil_nadu', 'india', 'cinema', 'sports', 'technology', 'business', 'lifestyle', 'spiritual'];
@@ -9,6 +9,18 @@ export default function Header({ activeTab, onTabChange, darkMode, toggleDarkMod
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -51,6 +63,12 @@ export default function Header({ activeTab, onTabChange, darkMode, toggleDarkMod
                 <p className="text-[10px] text-surface-400 leading-tight tracking-wide">Tamil Political News</p>
               </div>
             </a>
+            {isOffline && (
+              <span className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-medium">
+                <WifiOff size={10} />
+                Offline
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1">

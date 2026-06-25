@@ -2,6 +2,8 @@ import { RSS_URLS, CORS_PROXIES, CACHE_DURATION } from '../utils/constants';
 import { parseRSSItems, removeDuplicates, shuffleArray } from '../utils/helpers';
 
 const cache = new Map();
+const OFFLINE_KEY = 'itu-arasiyal-offline-articles';
+const MAX_OFFLINE = 50;
 
 function getCached(key) {
   const entry = cache.get(key);
@@ -11,6 +13,30 @@ function getCached(key) {
 
 function setCache(key, data) {
   cache.set(key, { data, time: Date.now() });
+}
+
+function saveOffline(articles) {
+  try {
+    const existing = getOfflineArticles();
+    const merged = [...articles, ...existing];
+    const unique = removeDuplicates(merged).slice(0, MAX_OFFLINE);
+    localStorage.setItem(OFFLINE_KEY, JSON.stringify(unique));
+  } catch (e) {
+    console.warn('[rss] offline save failed:', e.message);
+  }
+}
+
+export function getOfflineArticles() {
+  try {
+    const data = localStorage.getItem(OFFLINE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function isOfflineAvailable() {
+  return getOfflineArticles().length > 0;
 }
 
 async function fetchWithTimeout(url, ms) {
@@ -79,12 +105,19 @@ export async function fetchAllFeeds(category = 'all') {
   console.log('[rss] total articles:', articles.length);
 
   if (articles.length === 0) {
+    const offline = getOfflineArticles();
+    if (offline.length > 0) {
+      console.log('[rss] using offline cache:', offline.length, 'articles');
+      return offline;
+    }
     throw new Error('No articles found from any feed');
   }
 
   articles = removeDuplicates(articles);
   articles.forEach(a => { a.category = a.category || category || 'all'; });
-  return shuffleArray(articles);
+  const shuffled = shuffleArray(articles);
+  saveOffline(shuffled);
+  return shuffled;
 }
 
 export async function fetchSectionArticles(category) {
