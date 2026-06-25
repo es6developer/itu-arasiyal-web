@@ -84,7 +84,7 @@ export const SECTION_CONFIG = [
 ];
 
 export const CORS_PROXIES = [
-  (url) => `http://localhost:8081/proxy?url=${encodeURIComponent(url)}`,
+  (url) => `/proxy?url=${encodeURIComponent(url)}`,
 ];
 
 export const CACHE_DURATION = 15 * 60 * 1000;

@@ -5,7 +5,7 @@ function corsProxy() {
   return {
     name: 'cors-proxy',
     configureServer(server) {
-      server.middlewares.use('/api/proxy', async (req, res) => {
+      server.middlewares.use('/proxy', async (req, res) => {
         const fullUrl = new URL(req.url, `http://${req.headers.host}`)
         const targetUrl = fullUrl.searchParams.get('url')
 
