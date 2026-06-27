@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorState from '../components/ErrorState';
 import EmptyState from '../components/EmptyState';
 import BreakingTicker from '../components/BreakingTicker';
+import Ad from '../components/Ad';
 import { fetchSectionArticles } from '../services/rssService';
 
 export default function HomePage({ category = 'all', onOpenArticle }) {
@@ -99,9 +100,7 @@ export default function HomePage({ category = 'all', onOpenArticle }) {
         </div>
         {showAd && (
           <div className="mt-6 py-3 border-t border-surface-100 dark:border-surface-800">
-            <div className="bg-surface-100 dark:bg-surface-800 rounded-xl h-16 flex items-center justify-center">
-              <p className="text-xs text-surface-400">Advertisement</p>
-            </div>
+            <Ad type="banner" />
           </div>
         )}
       </section>
@@ -215,11 +214,14 @@ export default function HomePage({ category = 'all', onOpenArticle }) {
         </section>
       )}
 
-      {/* Ad placeholder */}
+      {/* Leaderboard ad */}
       <div className="mb-10 py-4 border-t border-surface-200 dark:border-surface-700">
-        <div className="bg-surface-100 dark:bg-surface-800 rounded-xl h-16 flex items-center justify-center">
-          <p className="text-xs text-surface-400">Advertisement</p>
-        </div>
+        <Ad type="leaderboard" />
+      </div>
+
+      {/* Mobile banner */}
+      <div className="mb-10 flex sm:hidden justify-center">
+        <Ad type="mobileBanner" />
       </div>
 
       {/* Category sections */}
@@ -252,6 +254,11 @@ export default function HomePage({ category = 'all', onOpenArticle }) {
           </div>
         </section>
       )}
+
+      {/* Bottom ad */}
+      <div className="mb-10 py-4 border-t border-surface-200 dark:border-surface-700">
+        <Ad type="mediumRectangle" />
+      </div>
     </div>
   );
 }

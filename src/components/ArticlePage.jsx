@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowLeft, Clock, Share2, Bookmark, BookmarkCheck, ExternalLink, Heart, ChevronRight, User, Tag, Volume2, VolumeX } from 'lucide-react';
 import { formatDate } from '../utils/helpers';
 import ArticleCard from './ArticleCard';
+import Ad from './Ad';
 import { useBookmarks } from '../hooks/useBookmarks';
 
 export default function ArticlePage({ article, allArticles, onBack, onOpenArticle }) {
@@ -177,6 +178,11 @@ export default function ArticlePage({ article, allArticles, onBack, onOpenArticl
           <ExternalLink size={16} />
         </a>
 
+        {/* In-content ad */}
+        <div className="mb-8 py-4 border-t border-surface-100 dark:border-surface-800">
+          <Ad type="mediumRectangle" />
+        </div>
+
         {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap mb-8">
           <Tag size={14} className="text-surface-400" />
@@ -216,8 +222,10 @@ export default function ArticlePage({ article, allArticles, onBack, onOpenArticl
           </section>
         )}
 
-        {/* Divider */}
-        <div className="border-t border-surface-200 dark:border-surface-700 my-8" />
+        {/* Bottom ad */}
+        <div className="mb-8 py-4 border-t border-surface-200 dark:border-surface-700">
+          <Ad type="banner" />
+        </div>
 
         {/* Recommended */}
         {recommended.length > 0 && (
